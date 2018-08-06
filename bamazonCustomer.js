@@ -7,67 +7,92 @@ let connection = mysql.createConnection({
 
     port: 3306,
 
-    user: "root",
+    user: "",
 
-    password: "mysql",
+    password: "",
 
     database: "bamazonDB"
 });
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 connection.connect(function (err) {
     if (err) throw err;
-    console.log("Connected as id " + connection.threadId);
     start();
 });
 
+
 function start() {
+    inquirer.prompt([{
+        name: "purchase",
+        type: "confirm",
+        message: "Would you like to purchase something?",
+        default: true
+    }]).then(userChoice => {
+        if (userChoice.purchase) {
+            console.log("\nThank you!\n");
+            buy();
+        } else {
+            console.log("\nThank you, please be sure to stop by again!\n")
+            connection.end();
+        }
+    })
+}
+
+
+function buy() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         console.table('Products Available for Purchase', res);
-        inquirer
-            .prompt([{
-                    type: "confirm",
-                    message: "Would you like to purchase something today?",
-                    name: "confirm",
-                    default: true
-                },
-                {
-                    name: "choice",
-                    type: "rawlist",
-                    choices: function () {
-                        var choiceArray = [];
-                        for (var i = 0; i < res.length; i++) {
-                            choiceArray.push("Item#: " + res[i].item_id + " || Product: " + res[i].product_name + " || Price: " + res[i].price);
-                        }
-                        return choiceArray;
+        let itemList = [];
+        res.forEach(function (item, idx) {
+            itemList.push(item.product_name + " $" + item.price);
+        })
+        // connection.end();
+        inquirer.prompt([{
+                name: "choice",
+                type: "list",
+                choices: itemList,
+                message: "What is the ID number of the product you would like to purchase?"
+            },
+            {
+                name: "buy",
+                type: "input",
+                message: "How many unit's would you like to purchase?"
+            }
+        ]).then(answers => {
+            // console.log(answers.choice);
 
-                    },
-                    message: "What is the ID number of the product you would like to purchase?"
-                },
-                {
-                    name: "buy",
-                    type: "input",
-                    message: "How many unit's would you like to purchase?"
+            let chosenItem;
+            for (let i = 0; i < res.length; i++) {
+                if ((res[i].product_name + " $" + res[i].price) === answers.choice) {
+                    chosenItem = res[i];
                 }
-            ])
-            .then(answers => {
-                let chosenItem;
-                for (let i = 0; i < res.length; i++) {
-                    if (res[i].product_name === answers.choice) {
-                        chosenItem = res[i];
-                    }
-                }
-                if (chosenItem.stock_quantity < parseInt(answer.buy)) {
-                    console.log(answers.buy)
-                    connection.query("DELETE FROM products WHERE stock_quantity ?", [{
-                            stock_quantity: answers.buy
+            }
+            let amount = chosenItem.stock_quantity - answers.buy;
+            // console.log(chosenItem.stock_quantity);
+
+            if (amount <= chosenItem.stock_quantity) {
+                console.log("You would like to purchase " + answers.buy + " " + chosenItem.product_name + "'s");
+                connection.query("UPDATE products SET ? WHERE ?", [{
+                            stock_quantity: amount
                         },
-                    ], function (err) {
+                        {
+                            item_id: chosenItem.item_id
+                        }
+                    ],
+                    function (err) {
                         if (err) throw err;
-                        console.log("New Stock Quantity for " + chosenItem + " is: " + res.stock_quantity);
-                    })
-                } else console.log("Insufficient quantity!")
-                end.connection();
-            })
+                        let amountOwed = chosenItem.price * answers.buy;
+                        console.log("You owe $" + amountOwed);
+                        console.log("\nNew Stock Quantity for " + chosenItem.product_name + " is: " + amount + "\n");
+                        start();
+                    });
+            } else {
+                console.log("Sorry! We don't have enough! Please choose another item or another amount");
+                start();
+            }
+        })
     })
-};
+}
