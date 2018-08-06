@@ -54,7 +54,7 @@ function buy() {
                 name: "choice",
                 type: "list",
                 choices: itemList,
-                message: "What is the ID number of the product you would like to purchase?"
+                message: "What product you would like to purchase?"
             },
             {
                 name: "buy",
