@@ -73,8 +73,8 @@ function buy() {
             let amount = chosenItem.stock_quantity - answers.buy;
             // console.log(chosenItem.stock_quantity);
 
-            if (amount <= chosenItem.stock_quantity) {
-                console.log("You would like to purchase " + answers.buy + " " + chosenItem.product_name + "'s");
+            if (answers.buy <= chosenItem.stock_quantity) {
+                console.log("\nYou would like to purchase " + answers.buy + " " + chosenItem.product_name + "'s\n");
                 connection.query("UPDATE products SET ? WHERE ?", [{
                             stock_quantity: amount
                         },
@@ -85,12 +85,12 @@ function buy() {
                     function (err) {
                         if (err) throw err;
                         let amountOwed = chosenItem.price * answers.buy;
-                        console.log("You owe $" + amountOwed);
+                        console.log("\nYou owe $" + amountOwed + "\n");
                         console.log("\nNew Stock Quantity for " + chosenItem.product_name + " is: " + amount + "\n");
                         start();
                     });
             } else {
-                console.log("Sorry! We don't have enough! Please choose another item or another amount");
+                console.log("\nSorry! We don't have enough! Please choose another item or another amount\n");
                 start();
             }
         })

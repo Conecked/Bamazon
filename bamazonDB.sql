@@ -13,10 +13,10 @@ CREATE TABLE products(
 );
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
-VALUES ("toothbrush", "General", 3.50, 25), ("tooth paste", "General", 5.35, 15), ("deoderent", "General", 8.25, 15), ("hair brush", "General", 4.50, 15);
+VALUES ("Toothbrush", "General", 3.50, 25), ("Toothpaste", "General", 5.35, 15), ("Deoderent", "General", 8.25, 15), ("Hair Brush", "General", 4.50, 15);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
-VALUES ("football", "Sports", 15.50, 10), ("baseball", "Sports", 6.50, 15), ("basketball", "Sports", 16.50, 5), ("soccerball", "Sports", 16.25, 5);
+VALUES ("Football", "Sports", 15.50, 10), ("Baseball", "Sports", 6.50, 15), ("Basketball", "Sports", 16.50, 5), ("Soccerball", "Sports", 16.25, 5);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ("Smokey the Bear Sweatshirt", "Clothing", 21.50, 8), ("Goonies V-neck Muscle Shirt", "Clothing", 17.25, 6), ("Purple People Eater Tank Top", "Clothing", 14.75, 7), ("Blink 182 Track Suit", "Clothing", 60.00, 2);
